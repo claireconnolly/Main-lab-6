@@ -1,11 +1,12 @@
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 using namespace std;
 
 const int HOTPLATE_SIZE = 10;
 
 void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
-bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
+bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], int iteration = 0);
 void CopyHotPlate(double (&newHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], double (&oldHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
@@ -18,15 +19,20 @@ int main() {
     HeatRow(0, hotPlate);
     HeatRow(9, hotPlate);
 
+    cout << "Hotplate simulator" << endl << endl;
+    cout << "Printing the initial plate values..." << endl;
     // Print out hotplate
     PrintHotPlate(hotPlate);
 
     cout << endl;
 
-    bool steadyStateAchieved = False;
+    bool steadyStateAchieved = false;
+    int iteration = 0;
+
     do {
-        steadyStateAchieved = UpdateElements(hotPlate);
-    } while (steadyStateAchieved == False);
+        steadyStateAchieved = UpdateElements(hotPlate, iteration);
+        iteration++;
+    } while (steadyStateAchieved == false);
 
     return 0;
 }
@@ -38,7 +44,7 @@ void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
     }
 }
 
-bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
+bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], int iteration) {
     double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE] = {0};
 
     CopyHotPlate(hotPlate, newHotPlate);
@@ -51,16 +57,26 @@ bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
 
     bool steadyStateAchieved = CheckSteadyState(hotPlate, newHotPlate);
 
-    if(steadyStateAchieved) {
-        return True;
-    } else {
+    if(!steadyStateAchieved) {
+        if(iteration == 0) {
+            // first iteration
+            cout << "Printing plate after one iteration..." << endl;
+            // Print out hotplate
+            PrintHotPlate(newHotPlate);
+        }
+
         // Copy new hotplate into old hotplate
         CopyHotPlate(newHotPlate, hotPlate);
 
-        // Print out hotplate
-        PrintHotPlate(hotPlate);
+        return false;
+    } else {
+        // Final hot plate
+        cout << "Printing final plate..." << endl;
 
-        return False;
+        // Print out hotplate
+        PrintHotPlate(newHotPlate);
+
+        return true;
     }
 }
 
@@ -83,16 +99,17 @@ void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]){
         }
         cout << endl;
     }
+    cout << endl;
 }
 
 bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
-    bool steadyStateAchieved = True;
+    bool steadyStateAchieved = true;
     for (int i = 0; i < HOTPLATE_SIZE; ++i) {
         for (int j = 0; j < HOTPLATE_SIZE; j++) {
             if (fabs(oldHotPlate[i][j] - newHotPlate[i][j]) > 0.1) {
-                steadyStateAchieved = False;
+                steadyStateAchieved = false;
             }
         }
     }
-    return steadyStateAchived;
+    return steadyStateAchieved;
 }
