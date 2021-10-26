@@ -5,12 +5,12 @@ using namespace std;
 const int HOTPLATE_SIZE = 10;
 
 void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
-void UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
+bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 void CopyHotPlate(double (&newHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], double (&oldHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
+bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 
 int main() {
-    /* ========================= PART 1 ========================= */
     // Initialize matrix with 0
     double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE] = {0};
 
@@ -23,11 +23,10 @@ int main() {
 
     cout << endl;
 
-    /* ========================= PART 2 ========================= */
-    UpdateElements(hotPlate);
-
-    // Print out hotplate
-    PrintHotPlate(hotPlate);
+    bool steadyStateAchieved = False;
+    do {
+        steadyStateAchieved = UpdateElements(hotPlate);
+    } while (steadyStateAchieved == False);
 
     return 0;
 }
@@ -39,7 +38,7 @@ void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
     }
 }
 
-void UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
+bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
     double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE] = {0};
 
     CopyHotPlate(hotPlate, newHotPlate);
@@ -50,8 +49,19 @@ void UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
         }
     }
 
-    // Copy new hotplate into old hotplate
-    CopyHotPlate(newHotPlate, hotPlate);
+    bool steadyStateAchieved = CheckSteadyState(hotPlate, newHotPlate);
+
+    if(steadyStateAchieved) {
+        return True;
+    } else {
+        // Copy new hotplate into old hotplate
+        CopyHotPlate(newHotPlate, hotPlate);
+
+        // Print out hotplate
+        PrintHotPlate(hotPlate);
+
+        return False;
+    }
 }
 
 void CopyHotPlate(double (&newHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], double (&oldHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
@@ -73,4 +83,16 @@ void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]){
         }
         cout << endl;
     }
+}
+
+bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
+    bool steadyStateAchieved = True;
+    for (int i = 0; i < HOTPLATE_SIZE; ++i) {
+        for (int j = 0; j < HOTPLATE_SIZE; j++) {
+            if (fabs(oldHotPlate[i][j] - newHotPlate[i][j]) > 0.1) {
+                steadyStateAchieved = False;
+            }
+        }
+    }
+    return steadyStateAchived;
 }
