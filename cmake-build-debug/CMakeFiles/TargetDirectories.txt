@@ -1,3 +1,3 @@
-/Users/claireconnolly/Documents/GitHub/Main-lab-6/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/claireconnolly/Documents/GitHub/Main-lab-6/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/claireconnolly/Documents/GitHub/Main-lab-6/cmake-build-debug/CMakeFiles/untitled6.dir
+C:/Users/santi/OneDrive/Desktop/programs/cs142/Main-lab-6/cmake-build-debug/CMakeFiles/untitled6.dir
+C:/Users/santi/OneDrive/Desktop/programs/cs142/Main-lab-6/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/santi/OneDrive/Desktop/programs/cs142/Main-lab-6/cmake-build-debug/CMakeFiles/rebuild_cache.dir
