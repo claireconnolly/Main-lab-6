@@ -7,6 +7,7 @@ const int HOTPLATE_SIZE = 10;
 void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 void UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 void CopyHotPlate(double (&newHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], double (&oldHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
+void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 
 int main() {
     /* ========================= PART 1 ========================= */
@@ -18,16 +19,7 @@ int main() {
     HeatRow(9, hotPlate);
 
     // Print out hotplate
-    for(int i = 0; i < HOTPLATE_SIZE; ++i) {
-        for(int j = 0; j < HOTPLATE_SIZE; ++j) {
-            cout << fixed << setprecision(3) << setw(9) << hotPlate[i][j];
-
-            if (j < HOTPLATE_SIZE - 1){
-                cout << ",";
-            }
-        }
-        cout << endl;
-    }
+    PrintHotPlate(hotPlate);
 
     cout << endl;
 
@@ -35,16 +27,7 @@ int main() {
     UpdateElements(hotPlate);
 
     // Print out hotplate
-    for(int i = 0; i < HOTPLATE_SIZE; ++i) {
-        for(int j = 0; j < HOTPLATE_SIZE; ++j) {
-            cout << fixed << setprecision(3) << setw(9) << hotPlate[i][j];
-
-            if (j < HOTPLATE_SIZE - 1){
-                cout << ",";
-            }
-        }
-        cout << endl;
-    }
+    PrintHotPlate(hotPlate);
 
     return 0;
 }
@@ -76,5 +59,18 @@ void CopyHotPlate(double (&newHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], double (&
         for (int j = 0; j < HOTPLATE_SIZE; ++j) {
             oldHotPlate[i][j] = newHotPlate[i][j];
         }
+    }
+}
+
+void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]){
+    for(int i = 0; i < HOTPLATE_SIZE; ++i) {
+        for(int j = 0; j < HOTPLATE_SIZE; ++j) {
+            cout << fixed << setprecision(3) << setw(9) << hotPlate[i][j];
+
+            if (j < HOTPLATE_SIZE - 1){
+                cout << ",";
+            }
+        }
+        cout << endl;
     }
 }
