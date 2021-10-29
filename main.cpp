@@ -8,7 +8,7 @@ using namespace std;
 const int HOTPLATE_SIZE = 10;
 const int PRECISION = 3;
 const int WIDTH = 9;
-const double MIN_VARIATION = 0.1;
+const double MIN_VARIATION = 0.1; // 0.1 degrees difference
 
 void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
@@ -115,10 +115,12 @@ bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
         }
     }
 
+    bool steadyStateAchieved = CheckSteadyState(hotPlate, newHotPlate);
+
     // Copy new hotplate into old hotplate
     CopyHotPlate(newHotPlate, hotPlate);
 
-    return CheckSteadyState(hotPlate, newHotPlate);
+    return steadyStateAchieved;
 }
 
 // Return true if values in new hot plate vary less than MIN_VARIATION
