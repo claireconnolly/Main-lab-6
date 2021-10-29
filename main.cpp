@@ -6,46 +6,48 @@
 using namespace std;
 
 const int HOTPLATE_SIZE = 10;
+const int PRECISION = 3;
+const int WIDTH = 9;
+const double MIN_VARIATION = 0.1;
 
 void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
+bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 void CopyHotPlate(double (&newHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], double (&oldHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]);
 void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
-bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]);
+void OutputHotPlateToFile(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], ostream& out);
 
 int main() {
-    // Initialize matrix with 0
+    cout << "Hotplate simulator" << endl << endl;
+
+    // Initialize array with 0
     double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE] = {0};
 
     // Heat top and bottom rows
     HeatRow(0, hotPlate);
     HeatRow(9, hotPlate);
 
-    cout << "Hotplate simulator" << endl << endl;
+    // Print initial hot plate
     cout << "Printing the initial plate values..." << endl;
-    // Print out hotplate
     PrintHotPlate(hotPlate);
-
     cout << endl;
 
+    // Iterate until a steady state is achieved
     bool steadyStateAchieved = false;
     int iteration = 0;
-
     do {
+        // Update elements
         steadyStateAchieved = UpdateElements(hotPlate);
 
-        // Print hot plate when required
-        if(!steadyStateAchieved) {
-            if(iteration == 0) {
-                // first iteration
-                cout << "Printing plate after one iteration..." << endl;
-                // Print out hotplate
-                PrintHotPlate(hotPlate);
-            }
-        } else {
-            // Final hot plate
+        // Print plate after one iteration
+        if(iteration == 0) {
+            cout << "Printing plate after one iteration..." << endl;
+            PrintHotPlate(hotPlate);
+        }
+
+        // Print final plate
+        if(steadyStateAchieved) {
             cout << "Printing final plate..." << endl;
-            // Print out hotplate
             PrintHotPlate(hotPlate);
         }
 
@@ -53,35 +55,24 @@ int main() {
     } while (steadyStateAchieved == false);
 
 
-    // output into file
-
+    // Output to Hotplate.csv
     cout << "Writing final plate to \"Hotplate.csv.\"..." << endl << endl;
+
+    // Create/open file
     ofstream out;
     out.open("Hotplate.csv");
 
     if (out.is_open()){
-        for(int i = 0; i < HOTPLATE_SIZE; ++i) {
-            for(int j = 0; j < HOTPLATE_SIZE; ++j) {
-                out << fixed << setprecision(3) << setw(9) << hotPlate[i][j];
-
-                if (j < HOTPLATE_SIZE - 1){
-                    out << ",";
-                }
-            }
-            out << endl;
-        }
-        out << endl;
-
+        OutputHotPlateToFile(hotPlate, out);
     }
 
     out.close();
 
-    //input test from file
-
+    // Input plate from Inputplate.txt
     ifstream in;
     in.open("Inputplate.txt");
 
-    // Initialize matrix with 0
+    // Initialize array with 0
     double inputPlate[HOTPLATE_SIZE][HOTPLATE_SIZE] = {0};
 
     // Load input plate
@@ -91,10 +82,12 @@ int main() {
         }
     }
 
+    // Iterate 3 times
     for (int i = 0; i < 3; i++) {
         UpdateElements(inputPlate);
     }
 
+    // Print plate after 3 iterations
     cout << "Printing input plate after 3 updates..." << endl;
     PrintHotPlate(inputPlate);
 
@@ -111,9 +104,9 @@ void HeatRow(int row, double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
     }
 }
 
+// Update the elements in the hotplate and return true if steady state is achieved
 bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
     double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE] = {0};
-
     CopyHotPlate(hotPlate, newHotPlate);
 
     for (int i = 1; i < HOTPLATE_SIZE - 1; ++i){
@@ -122,11 +115,22 @@ bool UpdateElements(double (&hotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
         }
     }
 
-    bool steadyStateAchieved = CheckSteadyState(hotPlate, newHotPlate);
-
     // Copy new hotplate into old hotplate
     CopyHotPlate(newHotPlate, hotPlate);
 
+    return CheckSteadyState(hotPlate, newHotPlate);
+}
+
+// Return true if values in new hot plate vary less than MIN_VARIATION
+bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
+    bool steadyStateAchieved = true;
+    for (int i = 0; i < HOTPLATE_SIZE; ++i) {
+        for (int j = 0; j < HOTPLATE_SIZE; j++) {
+            if (fabs(oldHotPlate[i][j] - newHotPlate[i][j]) > MIN_VARIATION) {
+                steadyStateAchieved = false;
+            }
+        }
+    }
     return steadyStateAchieved;
 }
 
@@ -141,7 +145,7 @@ void CopyHotPlate(double (&newHotPlate)[HOTPLATE_SIZE][HOTPLATE_SIZE], double (&
 void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]){
     for(int i = 0; i < HOTPLATE_SIZE; ++i) {
         for(int j = 0; j < HOTPLATE_SIZE; ++j) {
-            cout << fixed << setprecision(3) << setw(9) << hotPlate[i][j];
+            cout << fixed << setprecision(PRECISION) << setw(WIDTH) << hotPlate[i][j];
 
             if (j < HOTPLATE_SIZE - 1){
                 cout << ",";
@@ -152,14 +156,16 @@ void PrintHotPlate(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]){
     cout << endl;
 }
 
-bool CheckSteadyState(double oldHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], double newHotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE]) {
-    bool steadyStateAchieved = true;
-    for (int i = 0; i < HOTPLATE_SIZE; ++i) {
-        for (int j = 0; j < HOTPLATE_SIZE; j++) {
-            if (fabs(oldHotPlate[i][j] - newHotPlate[i][j]) > 0.1) {
-                steadyStateAchieved = false;
+void OutputHotPlateToFile(double hotPlate[HOTPLATE_SIZE][HOTPLATE_SIZE], ostream& out) {
+    for(int i = 0; i < HOTPLATE_SIZE; ++i) {
+        for(int j = 0; j < HOTPLATE_SIZE; ++j) {
+            out << fixed << setprecision(PRECISION) << setw(WIDTH) << hotPlate[i][j];
+
+            if (j < HOTPLATE_SIZE - 1){
+                out << ",";
             }
         }
+        out << endl;
     }
-    return steadyStateAchieved;
+    out << endl;
 }
